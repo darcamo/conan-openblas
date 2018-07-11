@@ -56,7 +56,7 @@ endif(CCACHE_FOUND)''')
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libdirs = ["lib64"]
+        self.cpp_info.libdirs = ["lib64", "lib"]
 
         # The openblas library has different names depending if it is a release
         # of a debug build
