@@ -33,10 +33,12 @@ class OpenblasConan(ConanFile):
 
     def source(self):
         openblas_git = tools.Git(folder="openblas")
-        openblas_git.clone(url="https://github.com/xianyi/OpenBLAS.git", branch="v{0}".format(self.version))
+        openblas_git.clone(url="https://github.com/xianyi/OpenBLAS.git",
+                           branch="v{0}".format(self.version))
 
-        tools.replace_in_file("openblas/CMakeLists.txt", "project(OpenBLAS C ASM)",
-                              '''project(OpenBLAS C ASM)
+        tools.replace_in_file(
+            "openblas/CMakeLists.txt", "project(OpenBLAS C ASM)",
+            '''project(OpenBLAS C ASM)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
@@ -56,7 +58,13 @@ endif(CCACHE_FOUND)''')
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libdirs = ["lib64", "lib"]
+        # By default conan has the 'lib' folder in self.cpp_info.libdirs
+        # In case cmake.install in the build step generated a lib64 folder
+        # instead of lib, we move it to lib
+        try:
+            shutil.move("lib64", "lib")
+        except Exception:
+            pass
 
         # The openblas library has different names depending if it is a release
         # of a debug build
