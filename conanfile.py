@@ -79,5 +79,5 @@ endif(CCACHE_FOUND)''')
             self.cpp_info.libs = ["openblas"]
 
         # In case of static library we need to also link with pthread
-        if not self.options.shared:
+        if self.settings.os == "Linux":
             self.cpp_info.libs.append("pthread")
