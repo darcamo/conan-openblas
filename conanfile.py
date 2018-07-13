@@ -31,6 +31,10 @@ class OpenblasConan(ConanFile):
             installer = tools.SystemPackageTool()
             installer.install("gcc", update=True, force=True)
 
+    def configure(self):
+        # Openblas does not use C++
+        del self.settings.compiler.libcxx
+
     def source(self):
         openblas_git = tools.Git(folder="openblas")
         openblas_git.clone(url="https://github.com/xianyi/OpenBLAS.git",
