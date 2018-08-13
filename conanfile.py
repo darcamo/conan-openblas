@@ -57,6 +57,7 @@ endif(CCACHE_FOUND)''')
         cmake = CMake(self)
         os.mkdir("build")
         shutil.move("conanbuildinfo.cmake", "build/")
+        cmake.definitions["DYNAMIC_ARCH"] = True
         cmake.configure(source_folder="openblas", build_folder="build")
         cmake.build()
         cmake.install()
