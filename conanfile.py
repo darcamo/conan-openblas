@@ -5,10 +5,10 @@ import shutil
 
 class OpenblasConan(ConanFile):
     name = "openblas"
-    version = "0.3.0"
+    version = "0.3.3"
     license = "https://raw.githubusercontent.com/xianyi/OpenBLAS/develop/LICENSE"
     author = "Darlan Cavalcante Moreira (darcamo@gmail.com)"
-    url = "https://github.com/darcamo/conan-recipes"
+    url = "https://github.com/darcamo/conan-openblas"
     description = "OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD version"
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
