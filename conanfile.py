@@ -5,7 +5,7 @@ import shutil
 
 class OpenblasConan(ConanFile):
     name = "openblas"
-    version = "0.3.3"
+    version = "0.3.4"
     license = "https://raw.githubusercontent.com/xianyi/OpenBLAS/develop/LICENSE"
     author = "Darlan Cavalcante Moreira (darcamo@gmail.com)"
     url = "https://github.com/darcamo/conan-openblas"
