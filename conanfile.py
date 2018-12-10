@@ -74,6 +74,8 @@ endif(CCACHE_FOUND)''')
         except Exception:
             pass
 
+        self.cpp_info.includedirs = ["include/openblas"]
+
         # The openblas library has different names depending if it is a release
         # of a debug build
         if self.settings.build_type == "Debug" and self.options.shared:
