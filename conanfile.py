@@ -5,14 +5,25 @@ import shutil
 
 class OpenblasConan(ConanFile):
     name = "openblas"
-    version = "0.3.5"
+    version = "0.3.6"
     license = "https://raw.githubusercontent.com/xianyi/OpenBLAS/develop/LICENSE"
     author = "Darlan Cavalcante Moreira (darcamo@gmail.com)"
     url = "https://github.com/darcamo/conan-openblas"
     description = "OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD version"
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False]}
-    default_options = "shared=True"
+    options = {"shared": [True, False],
+               "DYNAMIC_ARCH": [True, False],
+               "DYNAMIC_OLDER": [True, False],
+               "BUILD_WITHOUT_LAPACK": [True, False],
+               "BUILD_RELAPACK": [True, False],
+               "USE_THREAD": [True, False]
+              }
+    default_options = {
+        "shared": False,
+        "DYNAMIC_ARCH": False, "DYNAMIC_OLDER": False,
+        "BUILD_WITHOUT_LAPACK": False, "BUILD_RELAPACK": False,
+        "USE_THREAD": False
+        }
     generators = "cmake"
 
     def build_requirements(self):
@@ -57,9 +68,17 @@ endif(CCACHE_FOUND)''')
         cmake = CMake(self)
         os.mkdir("build")
         shutil.move("conanbuildinfo.cmake", "build/")
-        cmake.definitions["DYNAMIC_ARCH"] = True
-        cmake.definitions["USE_THREAD"] = False
-        # cmake.definitions["DYNAMIC_THREADS"] = True
+        cmake.definitions["DYNAMIC_ARCH"] = self.options.DYNAMIC_ARCH
+        cmake.definitions["DYNAMIC_OLDER"] = self.options.DYNAMIC_OLDER
+        cmake.definitions["BUILD_RELAPACK"] = self.options.BUILD_RELAPACK
+        cmake.definitions["BUILD_WITHOUT_LAPACK"] = self.options.BUILD_WITHOUT_LAPACK
+        cmake.definitions["USE_THREAD"] = self.options.USE_THREAD
+        
+        if self.settings.os == "Windows":
+            cmake.definitions["NO_LAPACK"] = True # No fortran compiler
+            
+        if self.settings.compiler == "Visual Studio":
+            cmake.definitions["MSVC_STATIC_CRT"] = "MT" in str(self.settings.compiler.runtime)
 
         cmake.configure(source_folder="openblas", build_folder="build")
         cmake.build()
