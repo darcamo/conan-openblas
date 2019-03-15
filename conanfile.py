@@ -11,8 +11,9 @@ class OpenblasConan(ConanFile):
     url = "https://github.com/darcamo/conan-openblas"
     description = "OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD version"
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False]}
-    default_options = "shared=True"
+    options = {"shared": [True, False],
+               "dynamic_arch": [True, False]}
+    default_options = "shared=True", "dynamic_arch=False"
     generators = "cmake"
 
     def build_requirements(self):
@@ -57,7 +58,12 @@ endif(CCACHE_FOUND)''')
         cmake = CMake(self)
         os.mkdir("build")
         shutil.move("conanbuildinfo.cmake", "build/")
-        cmake.definitions["DYNAMIC_ARCH"] = True
+
+        if self.options.dynamic_arch:
+            cmake.definitions["DYNAMIC_ARCH"] = True
+        else:
+            cmake.definitions["DYNAMIC_ARCH"] = True
+
         cmake.definitions["USE_THREAD"] = False
         # cmake.definitions["DYNAMIC_THREADS"] = True
 
