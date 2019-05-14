@@ -8,7 +8,7 @@ if __name__ == "__main__":
     # binaries compiled by travis to work on many different architectures
     filtered_builds = []
     for settings, options, env_vars, build_requires, reference in builder.items:
-        options["openblas:dynamic_arch"] = True
+        options["openblas:DYNAMIC_ARCH"] = True
         filtered_builds.append([settings, options, env_vars, build_requires])
 
     builder.builds = filtered_builds
