@@ -20,7 +20,7 @@ class OpenblasConan(ConanFile):
     }
     default_options = {
         "shared": False,
-        "DYNAMIC_ARCH": False,
+        "DYNAMIC_ARCH": True,
         "DYNAMIC_OLDER": False,
         "BUILD_WITHOUT_LAPACK": False,
         "BUILD_RELAPACK": False,
