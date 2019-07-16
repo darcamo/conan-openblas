@@ -27,6 +27,31 @@ class OpenblasConan(ConanFile):
         "USE_THREAD": False
     }
     generators = "cmake"
+    # This will store the cmake object so that we can used in the build and in
+    # the package methods
+    cmake = None
+
+    def _get_configured_cmake(self):
+        cmake = CMake(self)
+        if not os.path.exists("build"):
+            os.mkdir("build")
+            shutil.move("conanbuildinfo.cmake", "build/")
+
+        cmake.definitions["DYNAMIC_ARCH"] = self.options.DYNAMIC_ARCH
+        cmake.definitions["DYNAMIC_OLDER"] = self.options.DYNAMIC_OLDER
+        cmake.definitions["BUILD_RELAPACK"] = self.options.BUILD_RELAPACK
+        cmake.definitions["BUILD_WITHOUT_LAPACK"] = self.options.BUILD_WITHOUT_LAPACK
+        cmake.definitions["USE_THREAD"] = self.options.USE_THREAD
+
+        if self.settings.os == "Windows":
+            cmake.definitions["NO_LAPACK"] = True # No fortran compiler
+
+        if self.settings.compiler == "Visual Studio":
+            cmake.definitions["MSVC_STATIC_CRT"] = "MT" in str(self.settings.compiler.runtime)
+
+        cmake.configure(source_folder="openblas", build_folder="build")
+        OpenblasConan.cmake = cmake
+        return OpenblasConan.cmake
 
     def build_requirements(self):
         if self.settings.os == "Windows":
@@ -40,9 +65,21 @@ class OpenblasConan(ConanFile):
                 installer.install("gcc-fortran")
             else:
                 installer.install("gfortran")
+
+                # It seems that just gfortan is not enough in ubuntu. We need
+                # to install a libgfortan-X-dev package, where X must match gcc
+                # version.
+                if self.settings.get_safe("compiler") == "gcc":
+                    if self.settings.get_safe("compiler.version") == "8":
+                        installer.install("libgfortran-8-dev")
+                    elif self.settings.get_safe("compiler.version") == "7":
+                        installer.install("libgfortran-7-dev")
+                    elif self.settings.get_safe("compiler.version") == "9":
+                        installer.install("libgfortran-9-dev")
+
         if tools.os_info.is_macos:
             installer = tools.SystemPackageTool()
-            installer.install("gcc", update=True, force=True)
+            installer.install("gcc")
 
     def configure(self):
         # Openblas does not use C++
@@ -67,24 +104,14 @@ if(CCACHE_FOUND)
 endif(CCACHE_FOUND)''')
 
     def build(self):
-        cmake = CMake(self)
-        os.mkdir("build")
-        shutil.move("conanbuildinfo.cmake", "build/")
+        # This will be set by the self._get_configured_cmake method 
+        OpenblasConan.cmake = None
 
-        cmake.definitions["DYNAMIC_ARCH"] = self.options.DYNAMIC_ARCH
-        cmake.definitions["DYNAMIC_OLDER"] = self.options.DYNAMIC_OLDER
-        cmake.definitions["BUILD_RELAPACK"] = self.options.BUILD_RELAPACK
-        cmake.definitions["BUILD_WITHOUT_LAPACK"] = self.options.BUILD_WITHOUT_LAPACK
-        cmake.definitions["USE_THREAD"] = self.options.USE_THREAD
-
-        if self.settings.os == "Windows":
-            cmake.definitions["NO_LAPACK"] = True # No fortran compiler
-
-        if self.settings.compiler == "Visual Studio":
-            cmake.definitions["MSVC_STATIC_CRT"] = "MT" in str(self.settings.compiler.runtime)
-
-        cmake.configure(source_folder="openblas", build_folder="build")
+        cmake = self._get_configured_cmake()
         cmake.build()
+
+    def package(self):
+        cmake = self._get_configured_cmake()
         cmake.install()
 
     def package_info(self):
