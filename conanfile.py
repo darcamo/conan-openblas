@@ -1,11 +1,12 @@
 import os
 import shutil
-from conans import ConanFile, CMake, tools
+
+from conans import CMake, ConanFile, tools
 
 
 class OpenblasConan(ConanFile):
     name = "openblas"
-    version = "0.3.6"
+    version = "0.3.7"
     license = "https://raw.githubusercontent.com/xianyi/OpenBLAS/develop/LICENSE"
     author = "Darlan Cavalcante Moreira (darcamo@gmail.com)"
     url = "https://github.com/darcamo/conan-openblas"
@@ -30,6 +31,10 @@ class OpenblasConan(ConanFile):
     # This will store the cmake object so that we can used in the build and in
     # the package methods
     cmake = None
+
+    # TODO: Check the USE_LOCKING option introduced in openblas 0.3.7. If might
+    # be good to add it to the recipe for the case when USE_THREAD is set to
+    # False
 
     def _get_configured_cmake(self):
         cmake = CMake(self)
