@@ -47,6 +47,10 @@ class OpenblasConan(ConanFile):
         cmake.definitions["BUILD_RELAPACK"] = self.options.BUILD_RELAPACK
         cmake.definitions["BUILD_WITHOUT_LAPACK"] = self.options.BUILD_WITHOUT_LAPACK
         cmake.definitions["USE_THREAD"] = self.options.USE_THREAD
+        # Even when threads are not we enabled want locking such that we can
+        # call openblas from multiple threads ourselves
+        if not self.options.USE_THREAD:
+            cmake.definitions["USE_LOCKING"] = True
 
         if self.settings.os == "Windows":
             cmake.definitions["NO_LAPACK"] = True # No fortran compiler
