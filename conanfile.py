@@ -6,18 +6,19 @@ from conans import CMake, ConanFile, tools
 
 class OpenblasConan(ConanFile):
     name = "openblas"
-    version = "0.3.7"
+    version = "0.3.9"
     license = "https://raw.githubusercontent.com/xianyi/OpenBLAS/develop/LICENSE"
     author = "Darlan Cavalcante Moreira (darcamo@gmail.com)"
     url = "https://github.com/darcamo/conan-openblas"
     description = "OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD version"
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False],
-               "DYNAMIC_ARCH": [True, False],
-               "DYNAMIC_OLDER": [True, False],
-               "BUILD_WITHOUT_LAPACK": [True, False],
-               "BUILD_RELAPACK": [True, False],
-               "USE_THREAD": [True, False]
+    options = {
+        "shared": [True, False],
+        "DYNAMIC_ARCH": [True, False],
+        "DYNAMIC_OLDER": [True, False],
+        "BUILD_WITHOUT_LAPACK": [True, False],
+        "BUILD_RELAPACK": [True, False],
+        "USE_THREAD": [True, False]
     }
     default_options = {
         "shared": False,
@@ -45,7 +46,8 @@ class OpenblasConan(ConanFile):
         cmake.definitions["DYNAMIC_ARCH"] = self.options.DYNAMIC_ARCH
         cmake.definitions["DYNAMIC_OLDER"] = self.options.DYNAMIC_OLDER
         cmake.definitions["BUILD_RELAPACK"] = self.options.BUILD_RELAPACK
-        cmake.definitions["BUILD_WITHOUT_LAPACK"] = self.options.BUILD_WITHOUT_LAPACK
+        cmake.definitions[
+            "BUILD_WITHOUT_LAPACK"] = self.options.BUILD_WITHOUT_LAPACK
         cmake.definitions["USE_THREAD"] = self.options.USE_THREAD
         # Even when threads are not we enabled want locking such that we can
         # call openblas from multiple threads ourselves
@@ -53,10 +55,11 @@ class OpenblasConan(ConanFile):
             cmake.definitions["USE_LOCKING"] = True
 
         if self.settings.os == "Windows":
-            cmake.definitions["NO_LAPACK"] = True # No fortran compiler
+            cmake.definitions["NO_LAPACK"] = True  # No fortran compiler
 
         if self.settings.compiler == "Visual Studio":
-            cmake.definitions["MSVC_STATIC_CRT"] = "MT" in str(self.settings.compiler.runtime)
+            cmake.definitions["MSVC_STATIC_CRT"] = "MT" in str(
+                self.settings.compiler.runtime)
 
         cmake.configure(source_folder="openblas", build_folder="build")
         OpenblasConan.cmake = cmake
@@ -113,7 +116,7 @@ if(CCACHE_FOUND)
 endif(CCACHE_FOUND)''')
 
     def build(self):
-        # This will be set by the self._get_configured_cmake method 
+        # This will be set by the self._get_configured_cmake method
         OpenblasConan.cmake = None
 
         cmake = self._get_configured_cmake()
