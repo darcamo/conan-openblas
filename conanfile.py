@@ -6,7 +6,7 @@ from conans import CMake, ConanFile, tools
 
 class OpenblasConan(ConanFile):
     name = "openblas"
-    version = "0.3.9"
+    version = "0.3.10"
     license = "https://raw.githubusercontent.com/xianyi/OpenBLAS/develop/LICENSE"
     author = "Darlan Cavalcante Moreira (darcamo@gmail.com)"
     url = "https://github.com/darcamo/conan-openblas"
